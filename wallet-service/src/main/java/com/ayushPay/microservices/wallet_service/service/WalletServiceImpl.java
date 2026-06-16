@@ -19,7 +19,12 @@ public class WalletServiceImpl  implements WalletService{
 	private final WalletRepository walletRepository;
 
 	@Override
-	public WalletResponse createWallet(WalletRequest request) {
+	public WalletResponse createWallet(WalletRequest request) 
+	{
+		if(walletRepository.existsByUserId(request.getUserId()))
+		{
+			throw new RuntimeException("Wallet is already exists for user");
+		}
 		Wallet wallet= Wallet.builder().userId(request.getUserId()).
 				balance(BigDecimal.ZERO).build();
 				

@@ -12,5 +12,9 @@ import com.ayushPay.microservices.wallet_service.entity.Wallet;
 public interface WalletRepository extends JpaRepository<Wallet, Long>{
 	
 	Optional<Wallet>  findByUserId(Long userId);
+	
+	boolean existsByUserId(Long userId);
+	
+	
 
 }

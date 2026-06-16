@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="wallets")
+@Table(name="wallets", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "UK_USER_ID",
+                columnNames = "user_id"
+            )
+        })
 @Setter
 @Getter
 @AllArgsConstructor
@@ -28,7 +34,7 @@ public class Wallet
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long walletId;
 	
-	
+	@Column(name="user_id",unique = true)
 	private Long userId;
 	
 	@Column(nullable = false)
