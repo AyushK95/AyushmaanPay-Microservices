@@ -18,16 +18,20 @@ services:
       - registry
 
   gateway:
-    build:
-      context: ./api-gateway
+    build: ./api-gateway
+
+    depends_on:
+      registry:
+        condition: service_started
+      config:
+        condition: service_started
+      wallet:
+        condition: service_started
+      transaction:
+        condition: service_started
 
     ports:
       - "8080:8080"
-
-    depends_on:
-      - registry
-      - config
-      -
 
   wallet:
     depends_on:
