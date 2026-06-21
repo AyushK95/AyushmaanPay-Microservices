@@ -1,48 +1,46 @@
 services:
 
   registry:
-    build:
-      context: ./service-registry
-
+    build: ./service-registry
     ports:
       - "8761:8761"
 
   config:
-    build:
-      context: ./config-server
-
+    build: ./config-server
     ports:
       - "8888:8888"
 
     depends_on:
       - registry
 
-  gateway:
-    build: ./api-gateway
+  wallet:
+    build: ./wallet-service
+
+    ports:
+      - "8081:8080"
 
     depends_on:
-      registry:
-        condition: service_started
-      config:
-        condition: service_started
-      wallet:
-        condition: service_started
-      transaction:
-        condition: service_started
+      - config
+      - registry
+
+  transaction:
+    build: ./transaction-service
+
+    ports:
+      - "8082:8080"
+
+    depends_on:
+      - config
+      - registry
+
+  gateway:
+    build: ./api-gateway
 
     ports:
       - "8080:8080"
 
-  wallet:
     depends_on:
-      config:
-        condition: service_started
-      registry:
-        condition: service_started
-
-  transaction:
-    depends_on:
-      config:
-        condition: service_started
-      registry:
-        condition: service_started
+      - registry
+      - config
+      - wallet
+      - transaction
