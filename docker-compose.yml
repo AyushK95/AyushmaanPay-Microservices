@@ -2,31 +2,27 @@ services:
 
   registry:
     build: ./service-registry
-    container_name: registry
-
     ports:
       - "8761:8761"
 
   config:
     build: ./config-server
-    container_name: config
-
     ports:
       - "8888:8888"
 
     depends_on:
-      - registry
+      registry:
+        condition: service_started
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
-      interval: 20s
+      interval: 15s
       timeout: 10s
-      retries: 10
+      retries: 20
+      start_period: 60s
 
   wallet:
     build: ./wallet-service
-    container_name: wallet
-
     ports:
       - "8081:8080"
 
@@ -36,8 +32,6 @@ services:
 
   transaction:
     build: ./transaction-service
-    container_name: transaction
-
     ports:
       - "8082:8080"
 
@@ -47,8 +41,6 @@ services:
 
   gateway:
     build: ./api-gateway
-    container_name: gateway
-
     ports:
       - "8080:8080"
 
