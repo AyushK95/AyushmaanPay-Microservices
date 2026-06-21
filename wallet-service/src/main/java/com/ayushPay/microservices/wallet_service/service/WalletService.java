@@ -19,4 +19,6 @@ public interface WalletService {
 
 	Wallet credit(Long walletId, BigDecimal amount);
 
+	public Wallet rollback(Long walletId, BigDecimal amount);
+
 }

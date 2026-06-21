@@ -2,6 +2,9 @@ package com.ayushPay.microservices.wallet_service.service;
 
 import java.math.BigDecimal;
 
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ayushPay.microservices.wallet_service.dto.AddMoneyRequest;
@@ -14,11 +17,14 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WalletServiceImpl  implements WalletService{
-	
-	private final WalletRepository walletRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(WalletServiceImpl.class);
+    private final WalletRepository walletRepository;
 
 	@Override
+	@Transactional
 	public WalletResponse createWallet(WalletRequest request) 
 	{
 		if(walletRepository.existsByUserId(request.getUserId()))
@@ -33,14 +39,26 @@ public class WalletServiceImpl  implements WalletService{
 	}
 
 	@Override
-	public WalletResponse getWallet(Long walletId) {
-		
-		Wallet wallet=walletRepository.findByUserId(walletId).orElseThrow();
-		
+	@Transactional
+	public WalletResponse getWallet(
+			Long walletId
+	) {
+
+		Wallet wallet =
+				walletRepository
+						.findById(walletId)
+						.orElseThrow(
+								() ->
+										new RuntimeException(
+												"Wallet not found"
+										)
+						);
+
 		return map(wallet);
 	}
 
 	@Override
+	@Transactional
 	public WalletResponse addMoney(AddMoneyRequest addrequest) {
 		
 		Wallet wallet= walletRepository.findById(addrequest.getWalletId()). 
@@ -61,25 +79,41 @@ public class WalletServiceImpl  implements WalletService{
 	}
 	
 	@Override
+	@Transactional
 	public Wallet credit(
 	        Long walletId,
 	        BigDecimal amount) {
 
+		log.info("Credit started for wallet{} amount{}", walletId, amount);
+
 	    Wallet wallet = getWalletEntity(walletId);
+		log.info("Balance before credit is {}", wallet.getBalance());
 
 	    wallet.setBalance(
 	            wallet.getBalance().add(amount));
-
+        log.info("Balance after credit is {}", wallet.getBalance());
 	    return walletRepository.save(wallet);
+	}
+
+	@Override
+	@Transactional
+	public Wallet rollback(Long walletId, BigDecimal amount) {
+		Wallet wallet = getWalletEntity(walletId);
+		wallet.setBalance(wallet.getBalance().add(amount));
+		return walletRepository.save(wallet);
 	}
 
 
 	@Override
+	@Transactional
 	public Wallet debit(
 	        Long walletId,
 	        BigDecimal amount) {
 
+
+
 	    Wallet wallet = getWalletEntity(walletId);
+		System.out.println("Balance before debit is " +wallet.getBalance());
 
 	    if (wallet.getBalance()
 	            .compareTo(amount) < 0) {
@@ -91,8 +125,11 @@ public class WalletServiceImpl  implements WalletService{
 	    wallet.setBalance(
 	            wallet.getBalance().subtract(amount));
 
+		log.info("Balance after debit is {}", wallet.getBalance());
 	    return walletRepository.save(wallet);
-	}
+
+
+    }
 	
 	private Wallet getWalletEntity(Long walletId) {
 
@@ -101,4 +138,6 @@ public class WalletServiceImpl  implements WalletService{
 	                    new RuntimeException(
 	                            "Wallet not found"));
 	}
+
+
 }

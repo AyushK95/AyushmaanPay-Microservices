@@ -17,4 +17,7 @@ public interface WalletClient {
 	
 	@PostMapping("/api/wallets/credit")
 	void credit(@RequestBody CreditRequest creditRequest);
+
+	@PostMapping("/api/wallets/rollback")
+	void rollback(@RequestBody CreditRequest creditRequest);
 }

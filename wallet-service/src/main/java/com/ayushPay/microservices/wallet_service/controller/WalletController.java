@@ -1,5 +1,6 @@
 package com.ayushPay.microservices.wallet_service.controller;
 
+import com.ayushPay.microservices.wallet_service.entity.Wallet;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,45 +20,56 @@ import com.ayushPay.microservices.wallet_service.service.WalletService;
 @RequestMapping("/api/wallets")
 public class WalletController {
 
-	private final WalletService walletService;
+    private final WalletService walletService;
 
-	public WalletController(WalletService walletService) {
-		super();
-		this.walletService = walletService;
-	}
+    public WalletController(WalletService walletService) {
+        super();
+        this.walletService = walletService;
+    }
 
-	@PostMapping
-	public ResponseEntity<WalletResponse> createWallet(@RequestBody WalletRequest request) {
-		return ResponseEntity.ok(walletService.createWallet(request));
+    @PostMapping
+    public ResponseEntity<WalletResponse> createWallet(@RequestBody WalletRequest request) {
+        return ResponseEntity.ok(walletService.createWallet(request));
 
-	}
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<WalletResponse> getWallet(@PathVariable Long id) {
-		return ResponseEntity.ok(walletService.getWallet(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<WalletResponse> getWallet(@PathVariable Long id) {
+        return ResponseEntity.ok(walletService.getWallet(id));
 
-	}
+    }
 
-	@PostMapping("/addMoney")
-	public ResponseEntity<WalletResponse> addMoney(@RequestBody AddMoneyRequest addRequest) {
-		return ResponseEntity.ok(walletService.addMoney(addRequest));
-	}
+    @PostMapping("/addMoney")
+    public ResponseEntity<WalletResponse> addMoney(@RequestBody AddMoneyRequest addRequest) {
+        return ResponseEntity.ok(walletService.addMoney(addRequest));
+    }
 
-	@PostMapping("/debit")
-	public ResponseEntity<Void> debit(@RequestBody DebitRequest request) {
+    @PostMapping("/debit")
+    public ResponseEntity<Void> debit(@RequestBody DebitRequest request) {
 
-		walletService.debit(request.getWalletId(), request.getAmount());
+        walletService.debit(request.getWalletId(), request.getAmount());
 
-		return ResponseEntity.ok().build();
-	}
+        return ResponseEntity.ok().build();
+    }
 
-	// NEW
-	@PostMapping("/credit")
-	public ResponseEntity<Void> credit(@RequestBody CreditRequest request) {
+    // NEW
+    @PostMapping("/credit")
+    public ResponseEntity<Void> credit(@RequestBody CreditRequest request) {
 
-		walletService.credit(request.getWalletId(), request.getAmount());
+        walletService.credit(request.getWalletId(), request.getAmount());
 
-		return ResponseEntity.ok().build();
-	}
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/rollback")
+
+    public ResponseEntity<Wallet> rollback(@RequestBody CreditRequest request) {
+		return ResponseEntity.ok(walletService.rollback(request.getWalletId(), request.getAmount()
+                )
+        );
+
+
+    }
+
 
 }

@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class TransferRequest {
 
+	private Long userId;
+
 	private Long senderWalletId;
 
 	private Long receiverWalletId;
