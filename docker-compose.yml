@@ -27,24 +27,18 @@ services:
     depends_on:
       - registry
       - config
+      -
 
   wallet:
-    build:
-      context: ./wallet-service
-
-    ports:
-      - "8082:8082"
-
     depends_on:
-      - registry
+      config:
+        condition: service_started
+      registry:
+        condition: service_started
 
   transaction:
-    build:
-      context: ./transaction-service
-
-    ports:
-      - "8083:8083"
-
     depends_on:
-      - registry
-      - wallet
+      config:
+        condition: service_started
+      registry:
+        condition: service_started
